@@ -127,11 +127,18 @@ export const deletePoll = asyncHandler(async (req, res) => {
 
 export const voted = asyncHandler(async (req, res) => {
   const pollId = req.body.pollId;
+  const optionId = req.body.optionId;
   const poll = await Poll.findById(pollId);
 
   if (!poll) {
     res.status(422);
     throw new Error('poll id not found');
+  }
+
+  const option = poll.options.filter(item => item.optionId === optionId);
+  if (!option.length) {
+    res.status(422);
+    throw new Error('option id not found');
   }
 
   const deadlineVote = new Date(poll.deadlineVote);
@@ -147,7 +154,7 @@ export const voted = asyncHandler(async (req, res) => {
   if (!voteds.length) {
     voteds.push({
       userId: req.auth.userData.id,
-      optionId: req.body.optionId,
+      optionId,
       createdAt: new Date,
     });
   } else {
@@ -155,7 +162,7 @@ export const voted = asyncHandler(async (req, res) => {
     for (const item of voteds) {
       if (item.userId === req.auth.userData.id) {
         userVoted = true;
-        item.optionId = req.body.optionId;
+        item.optionId = optionId;
         item.updatedAt = new Date;
       }
     }
@@ -163,14 +170,13 @@ export const voted = asyncHandler(async (req, res) => {
     if (!userVoted) {
       voteds.push({
         userId: req.auth.userData.id,
-        optionId: req.body.optionId,
+        optionId,
         createdAt: new Date,
       })
     }
   }
 
-  poll.voted = voteds;
-  const updated = await Poll.updateOne({
+  await Poll.updateOne({
     _id: pollId,
   }, {
     $set: {
