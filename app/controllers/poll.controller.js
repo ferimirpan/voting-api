@@ -1,5 +1,6 @@
 import asyncHandler from '../middleware/async-handler.middleware.js';
 import Poll from '../models/poll.model.js';
+import User from '../models/user.model.js';
 
 export const addPoll = asyncHandler(async (req, res) => {
   if (!req.body) {
@@ -179,5 +180,50 @@ export const voted = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     message: 'voted successfully',
+  });
+});
+
+export const resultPoll = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const poll = await Poll.findById(id);
+
+  if (!poll) {
+    res.status(422);
+    throw new Error('poll id not found');
+  }
+
+  const totalAllVoted = poll.voted.length;
+  const options = [];
+
+  for (const option of poll.options) {
+    const voted = poll.voted.filter(item => item.optionId === option.optionId);
+    const totalVoted = voted.length;
+    const percentage = (totalVoted / totalAllVoted) * 100;
+    option.totalVoted = totalVoted;
+    option.percentage = percentage;
+    let usersVoted = [];
+
+    if (totalVoted) {
+      const userId = voted.map(({ userId }) => userId);
+      usersVoted = await User.find({
+        _id: {
+          $in: userId,
+        }
+      }, {
+        fullName: 1,
+      });
+    }
+    option.usersVoted = usersVoted;
+    delete option.createdAt;
+    delete option.createdBy;
+    options.push(option);
+  }
+
+  res.status(200).json({
+    message: 'success',
+    data: {
+      totalAllVoted,
+      options,
+    }
   });
 });
