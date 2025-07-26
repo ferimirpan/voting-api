@@ -28,6 +28,10 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw Error('password does not match');
   }
 
+  if (req.auth) {
+    req.body.createdBy = req.auth.userData.email;
+  }
+
   req.body.role = req.body.role ? req.body.role : 'user';
   delete req.body.passwordConfirmation;
   const user = await User.create(req.body);
@@ -68,9 +72,9 @@ export const loginData = asyncHandler(async (req, res) => {
 });
 
 export const logout = async (req, res) => {
-  console.log('req.auth', req.auth)
-  // perlu research untuk update isActived = false
-  // await Token.updateOne({ token: req.auth.token });
+  const token = await Token.findOne({ token: req.auth.token });
+  token.isActived = false;
+  await token.save();
   res.status(200).json({
     message: 'logout successfully',
   })
