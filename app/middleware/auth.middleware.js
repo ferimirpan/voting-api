@@ -24,4 +24,13 @@ export const protectedMiddleware = asyncHandler(async (req, res, next) => {
     res.status(401);
     throw new Error('Unautorization, token is required');
   }
-})
+});
+
+export const adminMiddleware = asyncHandler(async (req, res, next) => {
+  if (req.auth.userData.role === 'admin') {
+    next();
+  } else {
+    res.status(401);
+    throw new Error('Authorization not as Admin');
+  }
+});

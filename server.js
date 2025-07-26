@@ -2,9 +2,9 @@ import express from 'express';
 import 'dotenv/config';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import userRoute from './app/routes/user.route.js';
 import { errorHanlder, notFoundPath } from './app/middleware/error.middleware.js';
 import authRoute from './app/routes/auth.route.js';
+import userRoute from './app/routes/user.route.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
