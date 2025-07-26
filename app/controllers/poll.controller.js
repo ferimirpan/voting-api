@@ -136,9 +136,6 @@ export const voted = asyncHandler(async (req, res) => {
   const deadlineVote = new Date(poll.deadlineVote);
   const currentDate = new Date;
 
-  console.log('deadlineVote', deadlineVote);
-  console.log('currentDate', currentDate);
-
   if (deadlineVote < currentDate) {
     res.status(422);
     throw new Error('sorry, polling is closed');
@@ -156,14 +153,12 @@ export const voted = asyncHandler(async (req, res) => {
     let userVoted = false;
     for (const item of voteds) {
       if (item.userId === req.auth.userData.id) {
-        console.log('item', item)
         userVoted = true;
         item.optionId = req.body.optionId;
         item.updatedAt = new Date;
       }
     }
 
-    console.log('userVoted', userVoted)
     if (!userVoted) {
       voteds.push({
         userId: req.auth.userData.id,
@@ -173,13 +168,14 @@ export const voted = asyncHandler(async (req, res) => {
     }
   }
 
-  console.log('voteds', voteds)
   poll.voted = voteds;
-  poll.updatedAt = new Date;
-
-  console.log('poll', poll);
-  const updated = await poll.save();
-  console.log('updated', updated);
+  const updated = await Poll.updateOne({
+    _id: pollId,
+  }, {
+    $set: {
+      voted: voteds,
+    }
+  });
 
   res.status(200).json({
     message: 'voted successfully',
