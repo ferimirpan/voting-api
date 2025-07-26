@@ -10,6 +10,10 @@ const pollSchema = new Schema({
     type: String,
     required: [true, 'question is required'],
   },
+  deadlineVote: {
+    type: Date,
+    required: [true, 'deadlineVote is required'],
+  },
   options: {
     type: Array,
     required: [true, 'options is required'],

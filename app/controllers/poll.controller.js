@@ -123,3 +123,65 @@ export const deletePoll = asyncHandler(async (req, res) => {
     message: 'deleted successfully',
   });
 });
+
+export const voted = asyncHandler(async (req, res) => {
+  const pollId = req.body.pollId;
+  const poll = await Poll.findById(pollId);
+
+  if (!poll) {
+    res.status(422);
+    throw new Error('poll id not found');
+  }
+
+  const deadlineVote = new Date(poll.deadlineVote);
+  const currentDate = new Date;
+
+  console.log('deadlineVote', deadlineVote);
+  console.log('currentDate', currentDate);
+
+  if (deadlineVote < currentDate) {
+    res.status(422);
+    throw new Error('sorry, polling is closed');
+  }
+
+  const voteds = poll.voted;
+
+  if (!voteds.length) {
+    voteds.push({
+      userId: req.auth.userData.id,
+      optionId: req.body.optionId,
+      createdAt: new Date,
+    });
+  } else {
+    let userVoted = false;
+    for (const item of voteds) {
+      if (item.userId === req.auth.userData.id) {
+        console.log('item', item)
+        userVoted = true;
+        item.optionId = req.body.optionId;
+        item.updatedAt = new Date;
+      }
+    }
+
+    console.log('userVoted', userVoted)
+    if (!userVoted) {
+      voteds.push({
+        userId: req.auth.userData.id,
+        optionId: req.body.optionId,
+        createdAt: new Date,
+      })
+    }
+  }
+
+  console.log('voteds', voteds)
+  poll.voted = voteds;
+  poll.updatedAt = new Date;
+
+  console.log('poll', poll);
+  const updated = await poll.save();
+  console.log('updated', updated);
+
+  res.status(200).json({
+    message: 'voted successfully',
+  });
+});
