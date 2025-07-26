@@ -4,6 +4,9 @@ import { Op } from 'sequelize'
 
 export const userList = asyncHandler(async (req, res) => {
   const search = req.query.search;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skipAmount = (page - 1) * limit;
 
   let userData = [];
 
@@ -14,15 +17,21 @@ export const userList = asyncHandler(async (req, res) => {
         $regex: regex,
       },
       isActived: true,
-    }).select('-password');
+    }).select('-password')
+      .skip(skipAmount)
+      .limit(limit);
     userData = users;
   } else {
-    const users = await User.find({ isActived: true }).select('-password');
+    const users = await User.find({ isActived: true }).select('-password')
+      .skip(skipAmount)
+      .limit(limit);
     userData = users;
   }
 
   res.status(200).json({
     message: 'success',
+    page,
+    limit,
     data: userData,
   });
 });
