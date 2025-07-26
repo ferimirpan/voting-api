@@ -1,11 +1,29 @@
 import User from '../models/user.model.js';
 import asyncHandler from '../middleware/async-handler.middleware.js';
+import { Op } from 'sequelize'
 
 export const userList = asyncHandler(async (req, res) => {
-  const users = await User.find({ isActived: true }).select('-password');;
+  const search = req.query.search;
+
+  let userData = [];
+
+  if (search) {
+    const regex = new RegExp(search, 'i');
+    const users = await User.find({
+      fullName: {
+        $regex: regex,
+      },
+      isActived: true,
+    }).select('-password');
+    userData = users;
+  } else {
+    const users = await User.find({ isActived: true }).select('-password');
+    userData = users;
+  }
+
   res.status(200).json({
     message: 'success',
-    data: users,
+    data: userData,
   });
 });
 
