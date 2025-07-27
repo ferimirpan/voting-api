@@ -10,13 +10,13 @@ const signToken = (id) => {
 }
 
 const createResToken = async (user, statusCode, res) => {
+  user.password = undefined;
   const token = signToken(user._id);
-
-  delete user.password;
   await Token.create({
     token,
     createdBy: user._id,
   });
+
   res.status(statusCode).json({
     token,
     data: user,
@@ -24,16 +24,19 @@ const createResToken = async (user, statusCode, res) => {
 }
 
 export const registerUser = asyncHandler(async (req, res) => {
-  if (req.body.password !== req.body.passwordConfirmation) {
-    throw Error('password does not match');
+  if (req.body) {
+    if (req.body.password !== req.body.passwordConfirmation) {
+      throw Error('password does not match');
+    }
+
+    req.body.role = req.body.role ? req.body.role : 'user';
+    delete req.body.passwordConfirmation;
   }
 
   if (req.auth) {
     req.body.createdBy = req.auth.userData.email;
   }
 
-  req.body.role = req.body.role ? req.body.role : 'user';
-  delete req.body.passwordConfirmation;
   const user = await User.create(req.body);
   createResToken(user, 201, res);
 });
@@ -51,7 +54,6 @@ export const login = asyncHandler(async (req, res) => {
   const userData = await User.findOne({
     email: req.body.email
   });
-
 
   if (userData && (await userData.comparePassword(req.body.password))) {
     createResToken(userData, 200, res);
