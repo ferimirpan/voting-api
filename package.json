@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest  --watch --verbose",
+    "watch": "jest --watch --verbose"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   "homepage": "https://github.com/ferimirpan/voting-api#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cf-encrypt": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
@@ -28,6 +30,9 @@
     "validator": "^13.15.15"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "cross-env": "^10.0.0",
+    "jest": "^30.0.5",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 const { Schema } = mongoose;
+import encrypt from 'cf-encrypt';
 
 const userSchema = new Schema({
   fullName: {
@@ -39,12 +40,18 @@ const userSchema = new Schema({
 });
 
 userSchema.pre('save', async function () {
-  const saltRounds = 10;
-  this.password = await bcrypt.hash(this.password, saltRounds);
+  const key = process.env.SECRET_KEY;
+  this.password = encrypt.encrypt(this.password, key, 'hex');
 });
 
 userSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
+}
+
+userSchema.methods.cfDecrypt = async function (password) {
+  const key = process.env.SECRET_KEY;
+  const decypted = encrypt.decrypt(password, key, 'hex');
+  return decypted;
 }
 
 const User = mongoose.model('User', userSchema);

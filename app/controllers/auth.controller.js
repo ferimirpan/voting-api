@@ -42,6 +42,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const login = asyncHandler(async (req, res) => {
+  let decryptedPass = req.header('decryptedPass');
   if (!req.body) {
     res.status(400);
     throw new Error('email and password required');
@@ -55,9 +56,21 @@ export const login = asyncHandler(async (req, res) => {
     email: req.body.email
   });
 
-  if (userData && (await userData.comparePassword(req.body.password))) {
-    createResToken(userData, 200, res);
-  } else {
+  if (userData) {
+    let passwordInputed = req.body.password;
+    if (decryptedPass === undefined) {
+      passwordInputed = await userData.cfDecrypt(req.body.password);
+    }
+    const password = await userData.cfDecrypt(userData.password);
+
+    if (passwordInputed === password) {
+      createResToken(userData, 200, res);
+    } else {
+      res.status(400);
+      throw new Error('email or password invalid');
+    }
+  }
+  else {
     res.status(400);
     throw new Error('email or password invalid');
   }
