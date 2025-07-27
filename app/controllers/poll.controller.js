@@ -234,3 +234,21 @@ export const resultPoll = asyncHandler(async (req, res) => {
     }
   });
 });
+
+export const detailPoll = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const poll = await Poll.findById(id);
+
+  if (!poll) {
+    res.status(422);
+    throw new Error('poll id not found');
+  }
+
+  poll.isActived = false;
+  await poll.save();
+
+  res.status(200).json({
+    message: 'success',
+    data: poll,
+  });
+});
