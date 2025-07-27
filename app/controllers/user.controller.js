@@ -6,32 +6,24 @@ export const userList = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skipAmount = (page - 1) * limit;
-
-  let userData = [];
+  let filter = { isActived: true };
 
   if (search) {
     const regex = new RegExp(search, 'i');
-    const users = await User.find({
-      fullName: {
-        $regex: regex,
-      },
-      isActived: true,
-    }).select('-password')
-      .skip(skipAmount)
-      .limit(limit);
-    userData = users;
-  } else {
-    const users = await User.find({ isActived: true }).select('-password')
-      .skip(skipAmount)
-      .limit(limit);
-    userData = users;
+    filter.fullName = {
+      $regex: regex,
+    };
   }
+
+  const users = await User.find(filter).select('-password')
+    .skip(skipAmount)
+    .limit(limit);
 
   res.status(200).json({
     message: 'success',
     page,
     limit,
-    data: userData,
+    data: users,
   });
 });
 

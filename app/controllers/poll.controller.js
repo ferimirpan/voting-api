@@ -76,35 +76,36 @@ export const addOption = asyncHandler(async (req, res) => {
 
 export const pollList = asyncHandler(async (req, res) => {
   const search = req.query.search;
+  const votedActive = req.query.votedActive;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skipAmount = (page - 1) * limit;
-
-  let pollData = [];
+  let filter = { isActived: true };
 
   if (search) {
     const regex = new RegExp(search, 'i');
-    const polls = await Poll.find({
-      fullName: {
-        $regex: regex,
-      },
-      isActived: true,
-    })
-      .skip(skipAmount)
-      .limit(limit);
-    pollData = polls;
-  } else {
-    const polls = await Poll.find({ isActived: true })
-      .skip(skipAmount)
-      .limit(limit);
-    pollData = polls;
+    filter.name = {
+      $regex: regex,
+    };
   }
+
+  if (votedActive) {
+    if (votedActive === 'true') {
+      filter.deadlineVote = {
+        $gt: new Date,
+      }
+    }
+  }
+
+  const polls = await Poll.find(filter)
+    .skip(skipAmount)
+    .limit(limit);
 
   res.status(200).json({
     message: 'success',
     page,
     limit,
-    data: pollData,
+    data: polls,
   });
 });
 
