@@ -103,7 +103,7 @@ export const pollList = asyncHandler(async (req, res) => {
     .skip(skipAmount)
     .limit(limit);
 
-  if (polls.lenght) {
+  if (polls.length) {
     totalData = await Poll.find(filter).countDocuments();
     for (const item of polls) {
       let votedEnable = true;
