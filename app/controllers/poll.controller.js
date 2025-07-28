@@ -42,9 +42,9 @@ export const addPoll = asyncHandler(async (req, res) => {
 });
 
 export const addOption = asyncHandler(async (req, res) => {
-  if (!req.body) {
+  if (!req.body.name) {
     res.status(422);
-    throw Error('params is required');
+    throw Error('name option is required');
   }
 
   const pollId = req.params.id;
@@ -93,9 +93,20 @@ export const pollList = asyncHandler(async (req, res) => {
 
   if (votedActive) {
     if (votedActive === 'true') {
-      filter.deadlineVote = {
-        $gt: new Date,
-      }
+      filter = {
+        $and: [
+          {
+            deadlineVote: {
+              $gt: new Date,
+            }
+          },
+          {
+            'voted.userId': {
+              $ne: req.auth.userData.id,
+            }
+          }
+        ]
+      };
     }
   }
 
