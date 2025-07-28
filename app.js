@@ -6,7 +6,6 @@ import userRoute from './app/routes/user.route.js';
 import pollRoute from './app/routes/poll.route.js';
 
 const app = express();
-export default app;
 
 // cors middleware
 const corsOptions = {
@@ -25,3 +24,5 @@ app.use('/api/v1/poll', pollRoute);
 
 app.use(notFoundPath);
 app.use(errorHanlder);
+
+export default app;

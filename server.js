@@ -1,15 +1,12 @@
 
 import 'dotenv/config';
-import mongoose from 'mongoose';
 import app from './app.js';
+import { connectDB } from './app/config/db.js';
+
+const mongoURI = process.env.DATABASE;
+const PORT = process.env.PORT || 8000;
 
 // connection database
-try {
-  await mongoose.connect(process.env.DATABASE);
-  console.log('database connected');
-} catch (e) {
-  console.log(`failed to connect ${e.message}`);
-}
-
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`server started on port ${PORT}`));
+connectDB(mongoURI).then(() => {
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+});

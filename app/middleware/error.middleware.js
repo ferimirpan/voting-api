@@ -1,11 +1,16 @@
 export const errorHanlder = (err, req, res, next) => {
   let resStatusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;
+  const errorCode = err.errorResponse ? err.errorResponse.code : null;
 
   if (err.name === 'ValidationError') {
     message = Object.values(err.errors)
       .map((item) => item.message)
       .join(',')
+    resStatusCode = 400;
+  }
+
+  if (errorCode === 11000) {
     resStatusCode = 400;
   }
 

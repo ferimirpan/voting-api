@@ -2,6 +2,7 @@ import asyncHandler from '../middleware/async-handler.middleware.js';
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import Token from '../models/token.model.js';
+import 'dotenv/config';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -26,7 +27,8 @@ const createResToken = async (user, statusCode, res) => {
 export const registerUser = asyncHandler(async (req, res) => {
   if (req.body) {
     if (req.body.password !== req.body.passwordConfirmation) {
-      throw Error('password does not match');
+      res.status(400);
+      throw new Error('password does not match');
     }
 
     req.body.role = req.body.role ? req.body.role : 'user';

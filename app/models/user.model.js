@@ -3,6 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 const { Schema } = mongoose;
 import encrypt from 'cf-encrypt';
+import 'dotenv/config';
 
 const userSchema = new Schema({
   fullName: {
