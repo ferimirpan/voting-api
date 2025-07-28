@@ -7,6 +7,8 @@ export const userList = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skipAmount = (page - 1) * limit;
   let filter = { isActived: true };
+  let totalData = 0;
+  let totalPage = 0;
 
   if (search) {
     const regex = new RegExp(search, 'i');
@@ -19,10 +21,17 @@ export const userList = asyncHandler(async (req, res) => {
     .skip(skipAmount)
     .limit(limit);
 
+  if (users.length) {
+    totalData = await User.find(filter).countDocuments();
+    totalPage = Math.ceil(totalData / limit);
+  }
+
   res.status(200).json({
     message: 'success',
     page,
     limit,
+    totalPage,
+    totalData,
     data: users,
   });
 });

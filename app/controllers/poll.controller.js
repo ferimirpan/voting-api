@@ -81,6 +81,8 @@ export const pollList = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skipAmount = (page - 1) * limit;
   let filter = { isActived: true };
+  let totalData = 0;
+  let totalPage = 0;
 
   if (search) {
     const regex = new RegExp(search, 'i');
@@ -97,12 +99,12 @@ export const pollList = asyncHandler(async (req, res) => {
     }
   }
 
-  const dataPolls = [];
   const polls = await Poll.find(filter)
     .skip(skipAmount)
     .limit(limit);
 
   if (polls.lenght) {
+    totalData = await Poll.find(filter).countDocuments();
     for (const item of polls) {
       let votedEnable = true;
       if (new Date(item.deadlineVote) < new Date) {
@@ -110,12 +112,16 @@ export const pollList = asyncHandler(async (req, res) => {
       }
       item['votedEnable'] = votedEnable;
     }
+
+    totalPage = Math.ceil(totalData / limit);
   }
 
   res.status(200).json({
     message: 'success',
     page,
     limit,
+    totalPage,
+    totalData,
     data: polls,
   });
 });
