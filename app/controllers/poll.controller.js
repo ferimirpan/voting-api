@@ -97,9 +97,20 @@ export const pollList = asyncHandler(async (req, res) => {
     }
   }
 
+  const dataPolls = [];
   const polls = await Poll.find(filter)
     .skip(skipAmount)
     .limit(limit);
+
+  if (polls.lenght) {
+    for (const item of polls) {
+      let votedEnable = true;
+      if (new Date(item.deadlineVote) < new Date) {
+        votedEnable = false;
+      }
+      item['votedEnable'] = votedEnable;
+    }
+  }
 
   res.status(200).json({
     message: 'success',
