@@ -61,9 +61,10 @@ export const login = asyncHandler(async (req, res) => {
   if (userData) {
     let passwordInputed = req.body.password;
     if (decryptedPass === undefined) {
-      passwordInputed = await userData.cfDecrypt(req.body.password);
+      passwordInputed = await userData.decrypt(req.body.password);
     }
-    const password = await userData.cfDecrypt(userData.password);
+
+    const password = await userData.decrypt(userData.password);
 
     if (passwordInputed === password) {
       createResToken(userData, 200, res);

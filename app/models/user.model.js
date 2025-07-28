@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
 const { Schema } = mongoose;
-import encrypt from 'cf-encrypt';
 import 'dotenv/config';
+import CryptoJS from 'crypto-js';
 
 const userSchema = new Schema({
   fullName: {
@@ -42,16 +41,14 @@ const userSchema = new Schema({
 
 userSchema.pre('save', async function () {
   const key = process.env.SECRET_KEY;
-  this.password = encrypt.encrypt(this.password, key, 'hex');
+  this.password = CryptoJS.AES.encrypt(this.password, key).toString();
 });
 
-userSchema.methods.comparePassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
-}
 
-userSchema.methods.cfDecrypt = async function (password) {
+userSchema.methods.decrypt = async function (password) {
   const key = process.env.SECRET_KEY;
-  const decypted = encrypt.decrypt(password, key, 'hex');
+  const bytes = CryptoJS.AES.decrypt(password, key);
+  const decypted = bytes.toString(CryptoJS.enc.Utf8);
   return decypted;
 }
 
