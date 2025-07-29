@@ -27,7 +27,7 @@ const createResToken = async (user, statusCode, res) => {
 export const registerUser = asyncHandler(async (req, res) => {
   if (req.body) {
     if (req.body.password !== req.body.passwordConfirmation) {
-      res.status(400);
+      res.status(422);
       throw new Error('password does not match');
     }
 
@@ -46,11 +46,11 @@ export const registerUser = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   let decryptedPass = req.header('decryptedPass');
   if (!req.body) {
-    res.status(400);
+    res.status(422);
     throw new Error('email and password required');
   }
   if (!req.body.email && !req.body.password) {
-    res.status(400);
+    res.status(422);
     throw new Error('email and password required');
   }
 
@@ -69,12 +69,12 @@ export const login = asyncHandler(async (req, res) => {
     if (passwordInputed === password) {
       createResToken(userData, 200, res);
     } else {
-      res.status(400);
+      res.status(422);
       throw new Error('email or password invalid');
     }
   }
   else {
-    res.status(400);
+    res.status(422);
     throw new Error('email or password invalid');
   }
 });
