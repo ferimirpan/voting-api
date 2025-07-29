@@ -12,7 +12,7 @@ export const addPoll = asyncHandler(async (req, res) => {
 
   if (!req.body.options.length) {
     res.status(422);
-    throw Error('option is required');
+    throw Error('options is required');
   }
 
   if (req.body.options.length < 2) {
@@ -35,9 +35,10 @@ export const addPoll = asyncHandler(async (req, res) => {
 
   req.body.options = options;
 
-  await Poll.create(req.body);
+  const poll = await Poll.create(req.body);
   res.status(200).json({
     message: 'saved successfully',
+    data: poll,
   });
 });
 
