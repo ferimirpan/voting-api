@@ -7,11 +7,11 @@ export const errorHanlder = (err, req, res, next) => {
     message = Object.values(err.errors)
       .map((item) => item.message)
       .join(',')
-    resStatusCode = 400;
+    resStatusCode = 422;
   }
 
   if (errorCode === 11000) {
-    resStatusCode = 400;
+    resStatusCode = 422;
   }
 
   res.status(resStatusCode).json({
