@@ -7,9 +7,9 @@ const router = express.Router();
 router.post('/', protectedMiddleware, adminMiddleware, addPoll);
 router.patch('/addOption/:id', protectedMiddleware, addOption);
 router.get('/', protectedMiddleware, pollList);
+router.get('/detail/:id', protectedMiddleware, detailPoll);
 router.delete('/:id', protectedMiddleware, adminMiddleware, deletePoll);
 router.post('/voted', protectedMiddleware, voted);
 router.get('/result/:id', protectedMiddleware, adminMiddleware, resultPoll);
-router.get('/detail/:id', protectedMiddleware, detailPoll);
 
 export default router;

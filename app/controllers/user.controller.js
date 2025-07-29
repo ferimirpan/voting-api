@@ -1,5 +1,5 @@
 import User from '../models/user.model.js';
-import asyncHandler from '../middleware/async-handler.middleware.js';
+import asyncHandler from '../middleware/async-handler.js';
 
 export const userList = asyncHandler(async (req, res) => {
   const search = req.query.search;

@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import asyncHandler from './async-handler.middleware.js';
+import asyncHandler from './async-handler.js';
 import User from '../models/user.model.js';
 import Token from '../models/token.model.js';
 

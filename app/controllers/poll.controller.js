@@ -1,4 +1,4 @@
-import asyncHandler from '../middleware/async-handler.middleware.js';
+import asyncHandler from '../middleware/async-handler.js';
 import Poll from '../models/poll.model.js';
 import User from '../models/user.model.js';
 
@@ -43,7 +43,7 @@ export const addPoll = asyncHandler(async (req, res) => {
 });
 
 export const addOption = asyncHandler(async (req, res) => {
-  if (!req.body.name) {
+  if (!req.body || !req.body.name) {
     res.status(422);
     throw Error('name option is required');
   }
@@ -138,10 +138,23 @@ export const pollList = asyncHandler(async (req, res) => {
   });
 });
 
+export const detailPoll = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const poll = await Poll.findById(id);
+  if (!poll) {
+    res.status(422);
+    throw new Error('poll id not found');
+  }
+
+  res.status(200).json({
+    message: 'success',
+    data: poll,
+  });
+});
+
 export const deletePoll = asyncHandler(async (req, res) => {
   const id = req.params.id;
   const poll = await Poll.findById(id);
-
   if (!poll) {
     res.status(422);
     throw new Error('poll id not found');
@@ -261,20 +274,5 @@ export const resultPoll = asyncHandler(async (req, res) => {
       totalAllVoted,
       options,
     }
-  });
-});
-
-export const detailPoll = asyncHandler(async (req, res) => {
-  const id = req.params.id;
-  const poll = await Poll.findById(id);
-
-  if (!poll) {
-    res.status(422);
-    throw new Error('poll id not found');
-  }
-
-  res.status(200).json({
-    message: 'success',
-    data: poll,
   });
 });
