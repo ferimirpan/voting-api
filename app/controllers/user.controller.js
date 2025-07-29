@@ -49,6 +49,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 
   if (req.body.password && req.body.passwordConfirmation) {
     if (req.body.password !== req.body.passwordConfirmation) {
+      res.status(422);
       throw Error('password does not match');
     }
     delete req.body.passwordConfirmation;

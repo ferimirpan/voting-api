@@ -3,7 +3,6 @@ import request from 'supertest';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { connectDB, disconnectDB } from '../config/db.js';
 import 'dotenv/config';
-import Token from '../models/token.model.js';
 import Poll from '../models/poll.model.js';
 
 let mongoServer;
@@ -18,6 +17,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await Poll.deleteOne({
+    _id: poll._id,
+  });
   await disconnectDB();
   await mongoServer.stop();
 });
@@ -406,9 +408,5 @@ describe('result', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.body).toHaveProperty('message', 'success');
-
-    await Poll.deleteOne({
-      _id: poll._id,
-    });
   });
 });
