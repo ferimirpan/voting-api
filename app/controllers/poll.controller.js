@@ -249,7 +249,7 @@ export const resultPoll = asyncHandler(async (req, res) => {
     const totalVoted = voted.length;
     const percentage = (totalVoted / totalAllVoted) * 100;
     option.totalVoted = totalVoted;
-    option.percentage = percentage;
+    option.percentage = parseFloat(percentage.toFixed(2));
     let usersVoted = [];
 
     if (totalVoted) {
