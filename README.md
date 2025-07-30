@@ -5,7 +5,7 @@
 ### 1. Prerequisites
 
 - Node.js (LTS version) 
-- npm atau yarn
+- npm or yarn
 - I'm using Node.js version 22.17.1; please ensure you're using the same version or a higher one
 
 ### 2. Install Dependencies
